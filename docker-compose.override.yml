@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      args:
+        XDEBUG_ENABLED: true
+    volumes:
+      - ./php.override.ini:/usr/local/etc/php/php.override.ini
+    environment:
+      APP_ENV: development
+      APP_DEBUG: true
+
+  # You can also override other services or settings here

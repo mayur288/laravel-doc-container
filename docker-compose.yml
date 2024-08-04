@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      args:
+        XDEBUG_ENABLED: ${XDEBUG_ENABLED}
+    container_name: php-container
+    volumes:
+      - ./html:/var/www/html  # Mount your code to the container
+      - ./php.ini:/usr/local/etc/php/php.ini  # Custom PHP configuration
+    ports:
+      - "9000:9000"  # Expose port 9000 for PHP-FPM
+      - "3306:3306"  # Expose port 3306 for MySQL (optional)
+    depends_on:
+      - db
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+  composer:
+    image: composer:latest
+    container_name: composer-container
+    volumes:
+      - ./html:/app
+    networks:
+      - app-network
+    entrypoint: ["composer"]
+
+  db:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db-data:
